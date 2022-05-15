@@ -1,7 +1,7 @@
 ﻿
 bool done = false;
-string choise = "";
 bool subDone = false;
+string choise = "";
 string subChoise = "0";
 
 
@@ -12,14 +12,12 @@ do
     Console.Clear();
     Console.WriteLine("");
     Console.WriteLine("HUVUDMENY");
-
     Console.WriteLine("");
+    Console.WriteLine("Skriv in en siffra för att välja funktion");
     Console.WriteLine("1 - Boka biobiljetter");
     Console.WriteLine("2 - Upprepa tio gånger");
     Console.WriteLine("3 - Det tredje ordet");
     Console.WriteLine("0 - Avsluta");
-    Console.WriteLine("");
-    Console.WriteLine("Skriv in en siffra för att välja funktion");
 
     choise = Console.ReadLine();
 
@@ -27,35 +25,35 @@ do
     {
         case "1":
 
-            Console.WriteLine("");
-            Console.WriteLine("  Bokameny");
-            Console.WriteLine("  1 - Boka biobiljett");
-            Console.WriteLine("  2 - Boka biobiljetter för grupp");
-            Console.Write("  ");
+            
+            
 
             do
             {
+                Console.WriteLine("");
+                Console.WriteLine("  Bokameny");
+                Console.WriteLine("  1 - Boka biobiljett");
+                Console.WriteLine("  2 - Boka biobiljetter för grupp");
+                Console.WriteLine("  0 - Avbryt bokning");
+                Console.Write("  ");
                 subChoise = Console.ReadLine();
 
                 switch (subChoise)
                 {
                     case "1":
                         Order();
-                        subDone = true;
                         break;
 
                     case "2":
                         GroupOrder();
-                        subDone = true;
                         break;
 
                     case "0":
-                        Console.WriteLine("Avbryter beställning...");
                         subDone = true;
                         break;
 
                     default:
-                        Console.WriteLine("Felaktig input!");
+                        PrintErrorMsg();
                         break;
                 }
 
@@ -77,9 +75,11 @@ do
             break;
 
         default:
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Felaktig input!");
-            Console.WriteLine("Enter för att gå tillbaka");
-            Console.ReadLine();
+            Console.ResetColor();
+            Console.Write("Enter för att gå tillbaka ");
+            Console.ReadLine();                             // Pausa här för att anv ska hinna läsa
             break;
     }
 
@@ -91,15 +91,15 @@ void Order()
     uint price = 0;
 
     Console.WriteLine("");
-    Console.WriteLine("Beställning  (Skriv 0 för att avbryta)");
-
-    age = GetAge();
-    if (age == 0) { return; };
-    price = GetPrice(age);
-
-    Console.WriteLine("");
-    Console.WriteLine("Enter för att gå tillbaka");
-    Console.ReadLine();
+    Console.WriteLine("  Beställning  (Skriv 0 för att avbryta)");
+    Console.Write("  ");
+    age = InputAge();
+    if (age == 0) 
+    {
+        Console.WriteLine("  Avbryter bokningen...");
+        return;
+    }
+    price = WritePrice(age);
 }
 
 void GroupOrder()
@@ -109,95 +109,109 @@ void GroupOrder()
     uint sum = 0;
 
     Console.WriteLine("");
-    Console.WriteLine("Gruppbeställning  (Skriv 0 för att avbryta)");
+    Console.WriteLine("  Gruppbeställning  (Skriv 0 för att avbryta)");
 
-    nrOfVisitors = GetVisitorNr();
-    if (nrOfVisitors == 0) { return; }
+    nrOfVisitors = InputGroupSize();
+    if (nrOfVisitors == 0)
+    {
+        Console.WriteLine("  Avbryter bokningen...");
+        return;
+    }
+
     for (int i = 1; i <= nrOfVisitors; i++)
     {
-        Console.Write($"Person {i}: ");
-        age = GetAge();
-        if (age == 0) { return; };
-        sum += GetPrice(age);
+        Console.Write($"  Person {i}: ");
+        age = InputAge();
+        if (age == 0)
+        {
+            Console.WriteLine("  Avbryter bokningen...");
+            return;
+        }
+        sum += WritePrice(age);
     }
-    Console.WriteLine("");
-    Console.WriteLine($"Antal personer: {nrOfVisitors}");
-    Console.WriteLine($"Summa för grupp: {sum}kr");
 
     Console.WriteLine("");
-    Console.WriteLine("Enter för att gå tillbaka");
-    Console.ReadLine();
+    Console.WriteLine($"  Antal personer: {nrOfVisitors}");
+    Console.WriteLine($"  Summa för grupp: {sum}kr");
+
 }
 
-uint GetVisitorNr()
+uint InputGroupSize()
 {
     uint fellowshipNr = 0;
     string sFellowshipNr = "";
     bool done = false;
 
-    Console.Write("Hur många ska gå? ");
-
     do
     {
+        Console.Write("  Hur många ska gå? ");
         sFellowshipNr = Console.ReadLine();
         if(uint.TryParse(sFellowshipNr, out uint result))
         {
             fellowshipNr = result;
             done = true;
         }
-        else { Console.WriteLine("Felaktig input!"); }
+        else 
+        {
+            Console.Write("  ");
+            PrintErrorMsg();
+        }
 
     } while(!done);
 
     return fellowshipNr;
 }
 
-uint GetAge()
+uint InputAge()
 {
     uint age = 0;
     string sAge = "";
     bool done = false;
 
-    Console.Write("Ange ålder ");
-
     do
     {
+        Console.Write("Ange ålder ");
         sAge = Console.ReadLine();
         if (uint.TryParse(sAge, out uint result))
         {
             age = result;
             done = true;
         }
-        else { Console.WriteLine("Felaktig input!"); }
- 
+        else 
+        {
+            Console.Write("  ");
+            PrintErrorMsg();
+            Console.Write("  ");
+        }
+
     } while(!done);
 
     return age;
 }
 
-uint GetPrice(uint age)
+uint WritePrice(uint age)
 {
     uint price = 0;
 
     if(age < 5 || age > 100)
     {
         price = 0;
-        Console.WriteLine($"Fri Entre: {price}kr");
+        Console.WriteLine($"  Fri Entre: {price}kr");
     }
     else if(age < 20)
     {
         price = 80;
-        Console.WriteLine($"Ungdomspris: {price}kr"); 
+        Console.WriteLine($"  Ungdomspris: {price}kr"); 
     }
     else if(age > 64) 
     {
         price = 90;
-        Console.WriteLine($"Pensionärspris: {price}kr"); 
+        Console.WriteLine($"  Pensionärspris: {price}kr"); 
     }
     else 
     {
         price = 120;
-        Console.WriteLine($"Standardpris: {price}kr"); 
+        Console.WriteLine($"  Standardpris: {price}kr"); 
     }
 
     return price;
@@ -220,13 +234,13 @@ void Repeat10()
             WriteSeveralTimes(text, nrOfTimes);
 
             Console.WriteLine("");
-            Console.WriteLine("Enter för att gå tillbaka");
+            Console.Write("Enter för att gå tillbaka");
             Console.ReadLine();
             done = true;
         }
-        else { Console.WriteLine("Felaktig input!"); }
+        else { PrintErrorMsg(); }
 
-    }while(!done);
+    } while(!done);
 
 }
 
@@ -263,11 +277,11 @@ void Word3()
             Console.WriteLine("");
             Console.WriteLine($"Det tredje ordet är: {wordList[2]}");
             Console.WriteLine("");
-            Console.WriteLine("Enter för att gå tillbaka");
+            Console.Write("Enter för att gå tillbaka ");
             Console.ReadLine();
             done = true;
         }
-        else { Console.WriteLine("Felaktig input!"); }
+        else { PrintErrorMsg(); }
 
     } while (!done);
 
@@ -277,9 +291,16 @@ string RemoveDubbleSpace(string sentence)
 {
     do
     {
-        sentence = sentence.Replace("  ", " ");
+        sentence = sentence.Replace("  ", " ");     // Ersätt dubbelt mellanslag med enkelt
 
-    } while (sentence.Contains("  "));
+    } while (sentence.Contains("  "));              // tills det inte finns några kvar
 
-    return sentence.Trim();
+    return sentence.Trim();                         // Ta även bort inledande och efterföljande mellanslag
+}
+
+void PrintErrorMsg()
+{
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("Felaktig input! Försök igen.");
+    Console.ResetColor();
 }
